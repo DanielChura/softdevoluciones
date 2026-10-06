@@ -20,7 +20,7 @@ public interface ProductRepository extends JpaRepository<Product, UUID> {
   @Query("""
       SELECT p FROM Product p
       WHERE (:categoryId IS NULL OR p.category.id = :categoryId)
-        AND (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')))
+        AND (:name IS NULL OR LOWER(p.name) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')))
         AND (:onlyActive = false OR p.active = true)
       """)
   Page<Product> findByFilters(

@@ -25,7 +25,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
 
-    @Value("${app.frontend.oauth-success-url:http://localhost:4200/oauth/callback}")
+    @Value("${app.frontend.oauth-success-url}")
     private String frontendSuccessUrl;
 
     @Override
