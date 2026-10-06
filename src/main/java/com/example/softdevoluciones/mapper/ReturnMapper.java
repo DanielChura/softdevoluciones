@@ -43,7 +43,15 @@ public final class ReturnMapper {
         ReturnDetailResponse response = new ReturnDetailResponse();
         response.setId(item.getId());
         if (item.getOrderDetail() != null) {
-            response.setOrderDetailId(item.getOrderDetail().getId());
+            var orderDetail = item.getOrderDetail();
+            response.setOrderDetailId(orderDetail.getId());
+            response.setProductName(orderDetail.getProductName());
+            response.setUnitPrice(orderDetail.getUnitPrice());
+            if (orderDetail.getProduct() != null) {
+                response.setProductId(orderDetail.getProduct().getId());
+                response.setImageUrl(orderDetail.getProduct().getImageUrl());
+            }
+            response.setOrderDetail(OrderMapper.toItemResponse(orderDetail));
         }
         response.setQuantity(item.getQuantity());
         response.setAmount(item.getAmount());

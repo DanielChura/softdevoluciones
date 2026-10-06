@@ -85,7 +85,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneric(Exception ex) {
         return status(HttpStatus.INTERNAL_SERVER_ERROR,
-                "Ocurrió un error inesperado en el servidor. Por favor, inténtalo de nuevo más tarde y contacta al soporte si el problema persiste.");
+                "Ocurrió un error inesperado: " + ex.getMessage()
+                        + ". Por favor, inténtalo de nuevo más tarde y contacta al soporte si el problema persiste.");
     }
 
     private ResponseEntity<ApiError> status(HttpStatus status, String message) {

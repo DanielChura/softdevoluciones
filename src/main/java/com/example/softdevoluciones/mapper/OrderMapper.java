@@ -35,7 +35,11 @@ public final class OrderMapper {
 
     public static OrderItemResponse toItemResponse(OrderDetail item) {
         OrderItemResponse response = new OrderItemResponse();
-        response.setProductId(item.getProduct().getId());
+        response.setId(item.getId());
+        if (item.getProduct() != null) {
+            response.setProductId(item.getProduct().getId());
+            response.setImageUrl(item.getProduct().getImageUrl());
+        }
         response.setProductName(item.getProductName());
         response.setQuantity(item.getQuantity());
         response.setUnitPrice(item.getUnitPrice());

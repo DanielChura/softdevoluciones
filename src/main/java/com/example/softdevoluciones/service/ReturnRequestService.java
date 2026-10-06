@@ -53,12 +53,20 @@ public class ReturnRequestService {
                 .map(ReturnMapper::toResponse);
     }
 
+    @Transactional
     public ReturnResponse findById(UUID id, User user) {
         ReturnRequest returnRequest = getById(id);
         if (user.getRole() == UserRole.CUSTOMER && !returnRequest.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException(
                     "No tienes permiso para ver esta solicitud de devolución porque pertenece a otro usuario. Si necesitas ayuda, contacta al soporte.");
         }
+
+        if ((user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.OPERATOR)
+                && returnRequest.getStatus() == ReturnStatus.REQUESTED) {
+            returnRequest.setStatus(ReturnStatus.IN_REVIEW);
+            returnRequest = returnRequestRepository.save(returnRequest);
+        }
+
         return ReturnMapper.toResponse(returnRequest);
     }
 
@@ -75,7 +83,7 @@ public class ReturnRequestService {
 
         ReturnRequest returnRequest = new ReturnRequest();
         returnRequest.setUser(user);
-        returnRequest.setStatus(ReturnStatus.PENDING);
+        returnRequest.setStatus(ReturnStatus.REQUESTED);
         returnRequest.setReason(request.getReason());
         returnRequest.setComment(request.getComment());
         returnRequest.setOrder(order);
@@ -123,8 +131,12 @@ public class ReturnRequestService {
     @Transactional
     public ReturnResponse updateStatus(UUID id, ReturnStatusRequest req) {
         ReturnRequest returnRequest = getById(id);
+        ReturnStatus currentStatus = returnRequest.getStatus();
+        ReturnStatus nextStatus = req.getStatus();
 
-        if (req.getStatus() == ReturnStatus.APPROVED && returnRequest.getStatus() == ReturnStatus.PENDING) {
+        validateStateTransition(currentStatus, nextStatus);
+
+        if (nextStatus == ReturnStatus.APPROVED && currentStatus != ReturnStatus.APPROVED) {
             for (ReturnDetail item : returnRequest.getItems()) {
                 Product product = item.getOrderDetail().getProduct();
                 if (product != null) {
@@ -133,11 +145,48 @@ public class ReturnRequestService {
                 }
             }
         }
-        returnRequest.setStatus(req.getStatus());
+
+        returnRequest.setStatus(nextStatus);
         returnRequest.setOperatorNote(req.getOperatorNote());
 
         ReturnRequest saved = returnRequestRepository.save(returnRequest);
         return ReturnMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public ReturnResponse complete(UUID id, User user) {
+        ReturnRequest returnRequest = getById(id);
+
+        if (user.getRole() == UserRole.CUSTOMER && !returnRequest.getUser().getId().equals(user.getId())) {
+            throw new AccessDeniedException(
+                    "No tienes permiso para completar esta solicitud de devolución porque pertenece a otro usuario.");
+        }
+
+        validateStateTransition(returnRequest.getStatus(), ReturnStatus.COMPLETED);
+
+        returnRequest.setStatus(ReturnStatus.COMPLETED);
+        ReturnRequest saved = returnRequestRepository.save(returnRequest);
+        return ReturnMapper.toResponse(saved);
+    }
+
+    private void validateStateTransition(ReturnStatus current, ReturnStatus next) {
+        if (current == next) {
+            throw new BadRequestException(
+                    "La solicitud de devolución ya se encuentra en estado " + current + ".");
+        }
+
+        boolean isValid = switch (current) {
+            case REQUESTED -> next == ReturnStatus.IN_REVIEW;
+            case IN_REVIEW -> next == ReturnStatus.APPROVED || next == ReturnStatus.REJECTED;
+            case APPROVED -> next == ReturnStatus.COMPLETED;
+            case REJECTED, COMPLETED -> false;
+        };
+
+        if (!isValid) {
+            throw new BadRequestException("No es posible cambiar el estado de la solicitud de devolución de " + current
+                    + " a " + next
+                    + ". Por favor, respeta el flujo permitido: SOLICITADO (REQUESTED) → EN REVISIÓN (IN_REVIEW) → APROBADO (APPROVED) / RECHAZADO (REJECTED) → COMPLETADO (COMPLETED).");
+        }
     }
 
     @Transactional(readOnly = true)

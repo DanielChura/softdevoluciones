@@ -13,6 +13,9 @@ public interface ReturnDetailRepository extends JpaRepository<ReturnDetail, UUID
     @Query("""
             SELECT SUM(rd.quantity) FROM ReturnDetail AS rd
             WHERE rd.orderDetail.id = :orderDetailId
-            AND rd.request.status = com.example.softdevoluciones.enums.ReturnStatus.APPROVED""")
+            AND rd.request.status IN (
+                com.example.softdevoluciones.enums.ReturnStatus.APPROVED,
+                com.example.softdevoluciones.enums.ReturnStatus.COMPLETED
+            )""")
     Long findApprovedQuantityByOrderDetailId(@Param("orderDetailId") UUID orderDetailId);
 }

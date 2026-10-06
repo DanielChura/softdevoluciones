@@ -14,8 +14,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class OrderItemResponse {
 
+    private UUID id;
     private UUID productId;
     private String productName;
+    private String imageUrl;
     private Integer quantity;
     private BigDecimal unitPrice;
     private BigDecimal subtotal;

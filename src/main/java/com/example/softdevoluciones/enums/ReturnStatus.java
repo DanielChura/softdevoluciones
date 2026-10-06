@@ -1,7 +1,10 @@
 package com.example.softdevoluciones.enums;
 
 public enum ReturnStatus {
-    PENDING,
+    REQUESTED,
+    IN_REVIEW,
     APPROVED,
-    REJECTED
+    REJECTED,
+    COMPLETED
 }
+

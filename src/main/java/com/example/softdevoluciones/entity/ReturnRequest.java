@@ -44,7 +44,7 @@ public class ReturnRequest {
     @NotNull(message = "El estado de la devolución es obligatorio. Por favor, indica el estado correspondiente para continuar.")
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private ReturnStatus status = ReturnStatus.PENDING;
+    private ReturnStatus status = ReturnStatus.REQUESTED;
 
     @NotBlank(message = "El motivo es obligatorio. Por favor, describe el motivo de la devolución para continuar.")
     @Size(max = 500, message = "El motivo no puede superar los 500 caracteres. Por favor, acorta el texto e inténtalo de nuevo.")

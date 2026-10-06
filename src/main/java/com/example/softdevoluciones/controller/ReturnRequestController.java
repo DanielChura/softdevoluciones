@@ -69,4 +69,12 @@ public class ReturnRequestController {
             @Valid @RequestBody ReturnStatusRequest request) {
         return returnRequestService.updateStatus(id, request);
     }
+
+    @PatchMapping("/{id}/complete")
+    @PreAuthorize("hasAnyRole('CUSTOMER', 'ADMIN', 'OPERATOR')")
+    public ReturnResponse complete(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal User user) {
+        return returnRequestService.complete(id, user);
+    }
 }

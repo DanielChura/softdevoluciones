@@ -33,6 +33,7 @@ public final class CartMapper {
         CartItemResponse response = new CartItemResponse();
         response.setProductId(item.getProduct().getId());
         response.setProductName(item.getProduct().getName());
+        response.setImageUrl(item.getProduct().getImageUrl());
         response.setQuantity(item.getQuantity());
         response.setUnitPrice(item.getProduct().getPrice());
         response.setSubtotal(item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));

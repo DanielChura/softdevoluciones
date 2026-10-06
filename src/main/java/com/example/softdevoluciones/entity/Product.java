@@ -61,7 +61,7 @@ public class Product {
     @Size(max = 255, message = "El identificador público de la imagen no puede superar los 255 caracteres. Por favor, verifica el archivo e inténtalo de nuevo.")
     private String publicId;
 
-    @Column(nullable = false)
+    @Column(name = "is_active", nullable = false)
     private Boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

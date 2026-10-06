@@ -42,8 +42,8 @@ public class OrderDetail {
     private Product product;
 
     @NotBlank(message = "El nombre del producto es obligatorio. Por favor, verifica la información del pedido e inténtalo de nuevo.")
-    @Size(max = 100, message = "El nombre del producto no puede superar los 100 caracteres. Por favor, verifica la información e inténtalo de nuevo.")
-    @Column(nullable = false, length = 100)
+    @Size(max = 200, message = "El nombre del producto no puede superar los 200 caracteres. Por favor, verifica la información e inténtalo de nuevo.")
+    @Column(nullable = false, length = 200)
     private String productName;
 
     @NotNull(message = "La cantidad es obligatoria. Por favor, indica cuántas unidades corresponden a este producto.")
